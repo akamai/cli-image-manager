@@ -39,27 +39,27 @@ class EdgeGridConfig():
 
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
-        list_parser = subparsers.add_parser("list", help="Subcommands")
+        list_parser = subparsers.add_parser("list", help="List Policies")
 
         retrieve_parser = subparsers.add_parser("retrieve", help="Retrieve policy")
         retrieve_parser.add_argument('name', help="Policy name to retrieve", action='store')
-        retrieve_parser.add_argument('network', help="Network to retrieve from STAGING or PRODUCTION (default)", action='store', default='PRODUCTION')
+        retrieve_parser.add_argument('network', help="Network to retrieve from (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
                 
-        addpol_parser = subparsers.add_parser("add", help="Add policy")
+        addpol_parser = subparsers.add_parser("add", help="Add policy with default config to both networks")
         addpol_parser.add_argument('name', help="Policy name to add", action='store')
 
-        update_parser = subparsers.add_parser("update", help="Update policy")
+        update_parser = subparsers.add_parser("update", help="Update policy from JSON file")
         update_parser.add_argument('name', help="Policy name to update", action='store')
         update_parser.add_argument('input_file', type=argparse.FileType('rt'), help="JSON Config file")
-        update_parser.add_argument('network', help="Network to retrieve from STAGING or PRODUCTION (default)", action='store', default='PRODUCTION')
+        update_parser.add_argument('network', help="Network to update on (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
 
-        delete_parser = subparsers.add_parser("delete", help="Delete policy")
+        delete_parser = subparsers.add_parser("delete", help="Delete policy (both networks) USE CAUTION")
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
 
         parser.add_argument('--verbose', '-v', default=False, action='count')
         parser.add_argument('--debug', '-d', default=False, action='count')
-        parser.add_argument('--config_file', '-c', default='~/.edgerc')
-        parser.add_argument('--config_section', '-s', action='store')
+        parser.add_argument('--edgerc', '-e', default='~/.edgerc')
+        parser.add_argument('--section', '-s', action='store')
         parser.add_argument('--output_file', '-f', type=argparse.FileType('wt'), help=' Output file {list, retrieve}')
 
         required = parser.add_argument_group('Required arguments')
@@ -92,16 +92,16 @@ class EdgeGridConfig():
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
 
-        if "config_section" in arguments and arguments["config_section"]:
-            configuration = arguments["config_section"]
+        if "section" in arguments and arguments["section"]:
+            configuration = arguments["section"]
 
-        arguments["config_file"] = os.path.expanduser(arguments["config_file"])	
+        arguments["edgerc"] = os.path.expanduser(arguments["edgerc"])	
         
-        if os.path.isfile(arguments["config_file"]):
+        if os.path.isfile(arguments["edgerc"]):
             config = ConfigParser()
-            config.readfp(open(arguments["config_file"]))
+            config.readfp(open(arguments["edgerc"]))
             if not config.has_section(configuration):
-                err_msg = "ERROR: No section named %s was found in your %s file\n" % (configuration, arguments["config_file"])
+                err_msg = "ERROR: No section named %s was found in your %s file\n" % (configuration, arguments["edgerc"])
                 err_msg += "ERROR: Please generate credentials for the script functionality\n"
                 err_msg += "ERROR: and run 'python gen_edgerc.py %s' to generate the credential file\n" % configuration
                 sys.exit( err_msg )
