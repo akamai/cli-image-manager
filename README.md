@@ -7,7 +7,7 @@ This module enables the use of Image Manager in the Akamai CLI tool
 Installation is done via `akamai get`:
 
 ```
-$ akamai get github.com/brassic_lint/cli-imgman
+$ akamai get github.com/brassic-lint/cli-imgman
 ```
 
 Running this will run the system `python setup.py` automatically. 
