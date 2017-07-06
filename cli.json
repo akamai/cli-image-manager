@@ -1,0 +1,12 @@
+{
+  "requirements": {
+    "python": "2.7.6"
+  },
+  "commands": [
+    {
+      "name": "cli-imgman",
+      "version": "0.1.0",
+      "description": "An Akamai CLI package for Image Manager"
+    }
+  ]
+}

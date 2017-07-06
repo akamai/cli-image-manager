@@ -1,0 +1,206 @@
+#! /usr/bin/env python
+
+""" Copyright 2017 Akamai Technologies, Inc. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+
+ You may obtain a copy of the License at 
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ ***********************************************************
+ * ImgMan CLI module by Gareth Hughes (ghughes@akamai.com) *
+ ***********************************************************
+
+"""
+
+import requests, logging, json, random, sys, re
+from http_calls import EdgeGridHttpCaller
+from akamai.edgegrid import EdgeGridAuth
+from config import EdgeGridConfig
+from urlparse import urljoin
+import urllib
+from subprocess import call
+import os
+
+session = requests.Session()
+debug = False
+verbose = False
+section_name = "default"
+
+# If all parameters are set already, use them.  Otherwise
+# use the config
+config = EdgeGridConfig({"verbose":False},section_name)
+
+if hasattr(config, "debug") and config.debug:
+	debug = True
+
+if hasattr(config, "verbose") and config.verbose:
+	verbose = True
+
+# Set the config options
+session.auth = EdgeGridAuth(
+            client_token=config.client_token,
+            client_secret=config.client_secret,
+            access_token=config.access_token
+)
+
+if hasattr(config, 'headers'):
+	session.headers.update(config.headers)
+
+
+baseurl_prd = '%s://%s/' % ('https', config.host)
+baseurl_stg = '%s://%s/' % ('https', config.host.replace(".imaging.", ".imaging-staging."))
+
+prdHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_prd)
+stgHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_stg)
+
+def listPolicies(lunaToken):
+	session.headers.update({'Luna-Token': lunaToken})
+
+	listResultPrd = prdHttpCaller.getResult("/imaging/v0/policies")
+	listResultStg = stgHttpCaller.getResult("/imaging/v0/policies")
+
+	listResult = {
+		"staging" : listResultStg,
+		"production" :listResultPrd
+	
+	}
+	
+	return(listResult)
+
+def retrievePolicy(lunaToken, policyName, network):
+	session.headers.update({'Luna-Token': lunaToken})
+
+	print("Retrieving: " + policyName + " from " + network)
+
+	if network.upper == "STAGING" :
+		policyResult = stgHttpCaller.getResult("/imaging/v0/policies/" + policyName)
+	else :	
+		policyResult = prdHttpCaller.getResult("/imaging/v0/policies/" + policyName)
+
+	return(policyResult)
+
+def addPolicy(lunaToken, policyName):
+	session.headers.update({'Luna-Token': lunaToken, "Content-Type": "application/json"})
+
+	print("Creating " + policyName + " with default policy.")
+
+	requestParams = {
+		      "outputs": {
+		        "defaults": {
+		          "quality": 85
+		          }
+		        }
+		      }
+		      
+	policyResultPrd = prdHttpCaller.putResult("/imaging/v0/policies/" + policyName, json.dumps(requestParams))
+	policyResultStg = stgHttpCaller.putResult("/imaging/v0/policies/" + policyName, json.dumps(requestParams))
+
+	policyResult = {
+		"staging" : policyResultStg,
+		"production" :policyResultPrd
+	
+	}
+
+	return(policyResult)
+	
+def updatePolicy(lunaToken, policyName, policyData, network):
+
+	session.headers.update({'Luna-Token': lunaToken, "Content-Type": "application/json"})
+
+	print("Updating " + policyName)
+
+	if network.upper() == "STAGING" :
+		policyResult = stgHttpCaller.putResult("/imaging/v0/policies/" + policyName, policyData)
+	else :	
+		policyResult = prdHttpCaller.putResult("/imaging/v0/policies/" + policyName, policyData)
+
+	return(policyResult)
+
+def deletePolicy(lunaToken, policyName):
+	session.headers.update({'Luna-Token': lunaToken})
+
+	print("deleting " + policyName)
+
+	policyResultPrd = prdHttpCaller.deleteResult("/imaging/v0/policies/" + policyName)
+	policyResultStg = stgHttpCaller.deleteResult("/imaging/v0/policies/" + policyName)
+
+	policyResult = {
+		"staging" : policyResultStg,
+		"production" :policyResultPrd
+	
+	}
+
+	return(policyResult)
+
+def main():
+
+	if config.command == "list":
+		policyList = listPolicies(config.policy_set)
+		
+		if hasattr(config, 'output_file') and config.output_file != None :
+			config.output_file.write(json.dumps(policyList, indent=2))
+			config.output_file.close()
+		else :
+			print(json.dumps(policyList, indent=2))
+
+	elif config.command == "retrieve":
+		if config.network.upper() == "STAGING" or config.network.upper() == "PRODUCTION" :
+			
+			policyDetail = retrievePolicy(config.policy_set, config.name, config.network)
+			
+			if hasattr(config, 'output_file') and config.output_file != None :
+				config.output_file.write(json.dumps(policyDetail, indent=2))
+				config.output_file.close()
+			else :
+				print(json.dumps(policyDetail, indent=2))
+
+		else :
+			print("Invalid 'network' argument, must be 'STAGING' or 'PRODUCTION'")
+			
+	elif config.command == "update":
+
+		if config.network.upper() == "STAGING" or config.network.upper() == "PRODUCTION" :
+			
+			policyJSON = config.input_file.read()
+			config.input_file.close()
+
+			policyDetail = updatePolicy(config.policy_set, config.name, policyJSON, config.network)
+			
+			print(json.dumps(policyDetail, indent=2))
+		else :
+			print("Invalid 'network' argument, must be 'STAGING' or 'PRODUCTION'")
+
+	elif config.command == "add":
+		cmdResult = addPolicy(config.policy_set, config.name)
+		print(json.dumps(cmdResult, indent=2))
+
+	elif config.command == "delete":
+		cmdResult = deletePolicy(config.policy_set, config.name)
+		print(json.dumps(cmdResult, indent=2))
+
+	else:
+		parser.print_help(sys.stderr)
+
+if __name__ == "__main__":
+	main()
+
+	
+
+
+
+
+
+
+
+
+
+
