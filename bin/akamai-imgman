@@ -81,7 +81,7 @@ def retrievePolicy(lunaToken, policyName, network):
 
 	print("Retrieving: " + policyName + " from " + network)
 
-	if network.upper == "STAGING" :
+	if network.upper() == "STAGING" :
 		policyResult = stgHttpCaller.getResult("/imaging/v0/policies/" + policyName)
 	else :	
 		policyResult = prdHttpCaller.getResult("/imaging/v0/policies/" + policyName)
