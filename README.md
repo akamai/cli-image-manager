@@ -7,14 +7,14 @@ This module enables the use of Image Manager in the Akamai CLI tool
 Installation is done via `akamai get`:
 
 ```
-$ akamai get brassic-lint/cli-imgman
+$ akamai install imaging
 ```
 
 
 ## Usage
 
 ```
-usage: akamai imgman [-h] [--verbose] [--debug] [--edgerc CONFIG_FILE]
+usage: akamai imaging [-h] [--verbose] [--debug] [--edgerc CONFIG_FILE]
                      [--section CONFIG_SECTION]
                      [--output_file OUTPUT_FILE] --policy_set POLICY_SET
                      {list,retrieve,add,update,delete} ...
@@ -47,5 +47,5 @@ Required arguments:
 To update to the latest version:
 
 ```
-$ akamai update imgman
+$ akamai update imaging
 ```
