@@ -39,21 +39,21 @@ class EdgeGridConfig():
 
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
-        list_parser = subparsers.add_parser("list", help="List Policies")
+        list_parser = subparsers.add_parser("list", help="List all Policies")
 
-        retrieve_parser = subparsers.add_parser("retrieve", help="Retrieve policy")
+        retrieve_parser = subparsers.add_parser("retrieve", help="Retrieve a policy")
         retrieve_parser.add_argument('name', help="Policy name to retrieve", action='store')
         retrieve_parser.add_argument('network', help="Network to retrieve from (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
                 
-        addpol_parser = subparsers.add_parser("add", help="Add policy with default config to both networks")
+        addpol_parser = subparsers.add_parser("add", help="Add a policy with default configuration to both networks")
         addpol_parser.add_argument('name', help="Policy name to add", action='store')
 
-        update_parser = subparsers.add_parser("update", help="Update policy from JSON file")
+        update_parser = subparsers.add_parser("update", help="Update a policy from a JSON file")
         update_parser.add_argument('name', help="Policy name to update", action='store')
         update_parser.add_argument('input_file', type=argparse.FileType('rt'), help="JSON Config file")
         update_parser.add_argument('network', help="Network to update on (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
 
-        delete_parser = subparsers.add_parser("delete", help="Delete policy (both networks) USE CAUTION")
+        delete_parser = subparsers.add_parser("delete", help="Delete a policy (both networks) USE CAUTION")
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
 
         parser.add_argument('--verbose', '-v', default=False, action='count')

@@ -16,7 +16,9 @@
  limitations under the License.
 
  ***********************************************************
- * ImgMan CLI module by Gareth Hughes (ghughes@akamai.com) *
+ * Imgaging CLI module by Javier Garza (jgarza@akamai.com) *
+ * Based on https://github.com/brassic-lint/cli-imgman     *
+ *       from Gareth Hughes                                *
  ***********************************************************
 
 """
@@ -33,7 +35,7 @@ import os
 session = requests.Session()
 debug = False
 verbose = False
-section_name = "default"
+section_name = "imaging"
 
 # If all parameters are set already, use them.  Otherwise
 # use the config

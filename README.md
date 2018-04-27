@@ -4,42 +4,49 @@ This module enables the use of Image Manager in the Akamai CLI tool
 
 ## Install
 
-Installation is done via `akamai get`:
+To install, use [Akamai CLI](https://github.com/akamai/cli):
 
 ```
-$ akamai install imaging
+akamai install imaging
 ```
 
+You may also use this as a stand-alone command by downloading the
+[latest release binary](https://github.com/akamai/cli-imaging/releases)
+for your system, or by cloning this repository and compiling it yourself.
 
 ## Usage
 
 ```
-usage: akamai imaging [-h] [--verbose] [--debug] [--edgerc CONFIG_FILE]
-                     [--section CONFIG_SECTION]
-                     [--output_file OUTPUT_FILE] --policy_set POLICY_SET
-                     {list,retrieve,add,update,delete} ...
+akamai imaging [global flags] --policy_set POLICY_SET command 
+```
 
-Process command line options.
+## Global Flags
+- `--edgerc value` — Location of the credentials file (default: user's directory like "/Users/jgarza") [$AKAMAI_EDGERC]
+- `--section value` — Section of the credentials file (default: "imaging") [$AKAMAI_EDGERC_SECTION]
+- `--debug` - `-d` - prints debug information
+- `--output_file OUTPUT_FILE`, `-f OUTPUT_FILE` - Output file {list, retrieve}
+- `--verbose` - Print verbose information
+- `--version`, `-v` — Print the version
+- `--help`, `-h` — Show help
 
-positional arguments:
-  {list,retrieve,add,update,delete}
-                        commands
-    list                Subcommands
-    retrieve            Retrieve policy
-    add                 Add policy
-    update              Update policy
-    delete              Delete policy
+## Commands  
+- `add` - Add a policy
+- `delete` - Delete a policy
+- `list` — List policies
+- `retrieve` — Retrieve a specific policy
+- `update` — Update policy
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --verbose, -v
-  --debug, -d
-  --edgerc CONFIG_FILE, -e CONFIG_FILE
-  --section CONFIG_SECTION, -s CONFIG_SECTION
-  --output_file OUTPUT_FILE, -f OUTPUT_FILE   Output file {list, retrieve}
 
 Required arguments:
   --policy_set POLICY_SET, -p POLICY_SET
+```
+
+## Examples
+
+Retrieve a list of all policies using a specific instance of the Image Manager behavior:
+
+```
+$ akamai imaging --section devrel-imaging -p jgarza_sandbox_akamaideveloper_com-10526224 list
 ```
 
 ## Updating
