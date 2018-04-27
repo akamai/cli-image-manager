@@ -39,7 +39,6 @@ akamai imaging [global flags] --policy_set POLICY_SET command
 
 Required arguments:
   --policy_set POLICY_SET, -p POLICY_SET
-```
 
 ## Examples
 
