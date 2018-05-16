@@ -57,6 +57,7 @@ session.auth = EdgeGridAuth(
 if hasattr(config, 'headers'):
 	session.headers.update(config.headers)
 
+session.headers.update({'User-Agent': "AkamaiCLI"})
 
 baseurl_prd = '%s://%s/' % ('https', config.host)
 baseurl_stg = '%s://%s/' % ('https', config.host.replace(".imaging.", ".imaging-staging."))
