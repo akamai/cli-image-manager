@@ -5,6 +5,7 @@
   "commands": [
     {
       "name": "imaging",
+      "aliases": ["img"],
       "version": "0.1.1",
       "description": "An Akamai CLI package for Image Manager"
     }

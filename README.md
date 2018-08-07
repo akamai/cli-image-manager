@@ -48,6 +48,12 @@ Retrieve a list of all policies using a specific instance of the Image Manager b
 $ akamai imaging --section devrel-imaging -p jgarza_sandbox_akamaideveloper_com-10526224 list
 ```
 
+Retrieve a list of all policies using a specific instance of the Image Manager behavior and send the output to a file:
+
+```
+$ akamai imaging --section devrel-imaging --output_file imaging-policies.json -p jgarza_sandbox_akamaideveloper_com-10526224 list
+```
+
 ## Updating
 
 To update to the latest version:

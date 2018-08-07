@@ -56,6 +56,8 @@ class EdgeGridConfig():
         delete_parser = subparsers.add_parser("delete", help="Delete a policy (both networks) USE CAUTION")
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
 
+        parser.add_argument('--cache', '-c', default=False, action='count')
+        parser.add_argument('--human_readable', '-r', default=False, action='count')
         parser.add_argument('--verbose', '-v', default=False, action='count')
         parser.add_argument('--debug', '-d', default=False, action='count')
         parser.add_argument('--edgerc', '-e', default='~/.edgerc')

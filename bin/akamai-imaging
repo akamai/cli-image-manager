@@ -31,10 +31,13 @@ from urlparse import urljoin
 import urllib
 from subprocess import call
 import os
+from json2html import *
 
 session = requests.Session()
 debug = False
 verbose = False
+cache = False
+human_readable = False
 section_name = "imaging"
 
 # If all parameters are set already, use them.  Otherwise
@@ -46,6 +49,12 @@ if hasattr(config, "debug") and config.debug:
 
 if hasattr(config, "verbose") and config.verbose:
 	verbose = True
+
+if hasattr(config, "cache") and config.cache:
+	cache = True
+
+if hasattr(config, "human_readable") and config.human_readable:
+	human_readable = True
 
 # Set the config options
 session.auth = EdgeGridAuth(
@@ -159,11 +168,16 @@ def main():
 		if config.network.upper() == "STAGING" or config.network.upper() == "PRODUCTION" :
 			
 			policyDetail = retrievePolicy(config.policy_set, config.name, config.network)
-			
+
 			if hasattr(config, 'output_file') and config.output_file != None :
-				config.output_file.write(json.dumps(policyDetail, indent=2))
+				if hasattr(config, 'human_readable') and config.human_readable != None :
+					config.output_file.write(json2html.convert(policyDetail))
+				else :
+					config.output_file.write(json.dumps(policyDetail, indent=2))
 				config.output_file.close()
 			else :
+				if hasattr(config, 'human_readable') and config.human_readable != None :
+					print(json2html.convert(policyDetail))
 				print(json.dumps(policyDetail, indent=2))
 
 		else :
