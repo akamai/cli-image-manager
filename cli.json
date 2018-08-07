@@ -4,8 +4,8 @@
   },
   "commands": [
     {
-      "name": "imgman",
-      "version": "0.1.0",
+      "name": "imaging",
+      "version": "0.1.1",
       "description": "An Akamai CLI package for Image Manager"
     }
   ]
