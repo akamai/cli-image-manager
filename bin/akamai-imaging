@@ -33,6 +33,8 @@ from subprocess import call
 import os
 from json2html import *
 
+PACKAGE_VERSION = "0.1.1"
+
 session = requests.Session()
 debug = False
 verbose = False
