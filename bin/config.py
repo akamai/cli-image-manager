@@ -40,32 +40,31 @@ class EdgeGridConfig():
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
         list_parser = subparsers.add_parser("list", help="List all Policies")
+        list_parser.add_argument('--network', '-n', help="Network to list from (staging or production). Default is production", metavar='network', action='store', choices=['staging', 'production'],default='production')
+        list_parser.add_argument('--output_type', '-t', default='json', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is json')
 
-        retrieve_parser = subparsers.add_parser("retrieve", help="Retrieve a policy")
-        retrieve_parser.add_argument('name', help="Policy name to retrieve", action='store')
-        retrieve_parser.add_argument('network', help="Network to retrieve from (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
-                
-        addpol_parser = subparsers.add_parser("add", help="Add a policy with default configuration to both networks")
-        addpol_parser.add_argument('name', help="Policy name to add", action='store')
+        get_parser = subparsers.add_parser("get", help="Retrieves a policy")
+        get_parser.add_argument('name', help="Policy name to retrieve", action='store')
+        get_parser.add_argument('--network', '-n', help="Network to list from (staging or production). Default is production", metavar='network', action='store', choices=['staging', 'production'],default='production')
+        get_parser.add_argument('--output_file', '-f', type=argparse.FileType('wt'), metavar='file_name', help=' Save output to a file')
 
-        update_parser = subparsers.add_parser("update", help="Update a policy from a JSON file")
+        update_parser = subparsers.add_parser("set", help="Add or updates a policy from a JSON file")
         update_parser.add_argument('name', help="Policy name to update", action='store')
-        update_parser.add_argument('input_file', type=argparse.FileType('rt'), help="JSON Config file")
-        update_parser.add_argument('network', help="Network to update on (STAGING or PRODUCTION)", action='store', default='PRODUCTION')
+        update_parser.add_argument('--input_file', '-t', type=argparse.FileType('rt'), required=True, metavar='file_name', help="JSON Config file")
+        update_parser.add_argument('--network', '-n', help="Network where the policy resides (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
-        delete_parser = subparsers.add_parser("delete", help="Delete a policy (both networks) USE CAUTION")
+        delete_parser = subparsers.add_parser("delete", help="Deletes a policy ()")
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
+        delete_parser.add_argument('--network', '-n', help="Network to delete from (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
-        parser.add_argument('--cache', '-c', default=False, action='count')
-        parser.add_argument('--human_readable', '-r', default=False, action='count')
-        parser.add_argument('--verbose', '-v', default=False, action='count')
-        parser.add_argument('--debug', '-d', default=False, action='count')
-        parser.add_argument('--edgerc', '-e', default='~/.edgerc')
-        parser.add_argument('--section', '-s', action='store')
-        parser.add_argument('--output_file', '-f', type=argparse.FileType('wt'), help=' Output file {list, retrieve}')
+        parser.add_argument('--cache', '-c', default=False, action='count', help=' Uses the last cached version of the call (offline mode)')
+        parser.add_argument('--verbose', '-v', default=False, action='count', help=' Verbose mode')
+        parser.add_argument('--debug', '-d', default=False, action='count', help=' Debug mode (prints HTTP headers)')
+        parser.add_argument('--edgerc', '-e', default='~/.edgerc', metavar='credentials_file', help=' Location of the credentials file (default is ~/.edgerc)')
+        parser.add_argument('--section', '-s', default='imaging', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
 
         required = parser.add_argument_group('Required arguments')
-        required.add_argument('--policy_set', '-p', action='store',  required=True)
+        required.add_argument('--policy_set', '-p', action='store', metavar='im_policy_name',  required=True, help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
         
         if flags:
             for argument in flags.keys():

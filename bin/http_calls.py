@@ -74,8 +74,8 @@ class EdgeGridHttpCaller():
       
       if status_code in [404]:
                     error_msg =  "ERROR: Call to %s failed with a %s result\n" % (endpoint, status_code)
-                    error_msg +=  "ERROR: This means that the page does not exist as requested.\n"
-                    error_msg +=  "ERROR: Please ensure that the URL you're calling is correctly formatted\n"
+                    error_msg +=  "ERROR: This means that the object does not exist as requested.\n"
+                    error_msg +=  "ERROR: Please ensure that the URL you're calling is valid and correctly formatted\n"
                     error_msg +=  "ERROR: or look at other examples to make sure yours matches.\n"
                     error_msg +=  "ERROR: Problem details: %s\n" % details
                     exit(error_msg)

@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 
 """ Copyright 2017 Akamai Technologies, Inc. All Rights Reserved.
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
 
- You may obtain a copy of the License at 
+ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
@@ -22,25 +22,34 @@
  ***********************************************************
 
 """
-
-import requests, logging, json, random, sys, re
+# Libraries commmon to python 2 and 3
+import sys, os
+import requests, logging, json, random, re
 from http_calls import EdgeGridHttpCaller
 from akamai.edgegrid import EdgeGridAuth
 from config import EdgeGridConfig
-from urlparse import urljoin
 import urllib
 from subprocess import call
-import os
 from json2html import *
+from texttable import *
 
-PACKAGE_VERSION = "0.1.1"
+if sys.version_info[0] >= 3:
+     # python3
+	from urllib.parse import urljoin
+else:
+     # python2.7
+     from urlparse import urljoin
+
+
+PACKAGE_VERSION = "0.1.2"
 
 session = requests.Session()
 debug = False
 verbose = False
 cache = False
-human_readable = False
+format = "json"
 section_name = "imaging"
+network = "production"
 
 # If all parameters are set already, use them.  Otherwise
 # use the config
@@ -55,8 +64,6 @@ if hasattr(config, "verbose") and config.verbose:
 if hasattr(config, "cache") and config.cache:
 	cache = True
 
-if hasattr(config, "human_readable") and config.human_readable:
-	human_readable = True
 
 # Set the config options
 session.auth = EdgeGridAuth(
@@ -76,134 +83,104 @@ baseurl_stg = '%s://%s/' % ('https', config.host.replace(".imaging.", ".imaging-
 prdHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_prd)
 stgHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_stg)
 
-def listPolicies(lunaToken):
+def listPolicies(lunaToken, network):
 	session.headers.update({'Luna-Token': lunaToken})
 
-	listResultPrd = prdHttpCaller.getResult("/imaging/v2/policies")
-	listResultStg = stgHttpCaller.getResult("/imaging/v2/policies")
+	if network == "staging" :
+		listResult = stgHttpCaller.getResult("/imaging/v2/policies")
+	else :
+		listResult = prdHttpCaller.getResult("/imaging/v2/policies")
 
-	listResult = {
-		"staging" : listResultStg,
-		"production" :listResultPrd
-	
-	}
-	
 	return(listResult)
 
-def retrievePolicy(lunaToken, policyName, network):
+def getPolicy(lunaToken, policyName, network):
 	session.headers.update({'Luna-Token': lunaToken})
 
 	print("Retrieving: " + policyName + " from " + network)
 
-	if network.upper() == "STAGING" :
+	if network == "staging" :
 		policyResult = stgHttpCaller.getResult("/imaging/v2/policies/" + policyName)
-	else :	
+	else :
 		policyResult = prdHttpCaller.getResult("/imaging/v2/policies/" + policyName)
 
 	return(policyResult)
 
-def addPolicy(lunaToken, policyName):
-	session.headers.update({'Luna-Token': lunaToken, "Content-Type": "application/json"})
-
-	print("Creating " + policyName + " with default policy.")
-
-	requestParams = {
-		      "outputs": {
-		        "defaults": {
-		          "quality": 85
-		          }
-		        }
-		      }
-		      
-	policyResultPrd = prdHttpCaller.putResult("/imaging/v2/policies/" + policyName, json.dumps(requestParams))
-	policyResultStg = stgHttpCaller.putResult("/imaging/v2/policies/" + policyName, json.dumps(requestParams))
-
-	policyResult = {
-		"staging" : policyResultStg,
-		"production" :policyResultPrd
-	
-	}
-
-	return(policyResult)
-	
-def updatePolicy(lunaToken, policyName, policyData, network):
+def setPolicy(lunaToken, policyName, policyData, network):
 
 	session.headers.update({'Luna-Token': lunaToken, "Content-Type": "application/json"})
 
 	print("Updating " + policyName)
 
-	if network.upper() == "STAGING" :
+	if network == "staging" :
 		policyResult = stgHttpCaller.putResult("/imaging/v2/policies/" + policyName, policyData)
-	else :	
+	else :
 		policyResult = prdHttpCaller.putResult("/imaging/v2/policies/" + policyName, policyData)
 
 	return(policyResult)
 
-def deletePolicy(lunaToken, policyName):
+def deletePolicy(lunaToken, policyName, network):
 	session.headers.update({'Luna-Token': lunaToken})
 
-	print("deleting " + policyName)
-
-	policyResultPrd = prdHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
-	policyResultStg = stgHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
-
-	policyResult = {
-		"staging" : policyResultStg,
-		"production" :policyResultPrd
-	
-	}
+	print("deleting " + policyName + " on " + network + " networks")
+	if network == "both":
+		policyResultStg = stgHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
+		policyResultPrd = prdHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
+		policyResult = {"staging" : policyResultStg,"production" :policyResultPrd}
+	if network == "staging":
+		policyResultStg = stgHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
+		policyResult = {"staging" : policyResultStg}
+	if network == "production" or network == "both":
+		policyResultPrd = prdHttpCaller.deleteResult("/imaging/v2/policies/" + policyName)
+		policyResult = {"production" :policyResultPrd}
 
 	return(policyResult)
 
 def main():
 
 	if config.command == "list":
-		policyList = listPolicies(config.policy_set)
-		
+		# Get the list of policies in JSON format for the given network
+		policyList = listPolicies(config.policy_set, config.network)
+
+		print("Policy:",config.policy_set,"\tNetwork:",config.network,"\tOutput:",config.output_type)
+
+		if hasattr(config, 'output_type') and config.output_type == "json" :
+			# Let's convert the JSON to HTML
+			policyListFormatted = json.dumps(policyList, indent=2)
+			print(policyListFormatted)
+
+		if hasattr(config, 'output_type') and config.output_type == "html" :
+			# Let's convert the JSON to HTML
+			policyListFormatted = json2html.convert(policyList)
+			print(policyListFormatted)
+
+		if hasattr(config, 'output_type') and config.output_type == "text" :
+			# Iterate over the dictionary and print only selected information
+			print('%20s | %25s | %20s' % ("Policy name","Date Created","User"))
+			print('='*77)
+			for my_item in policyList["items"]:
+				print('%20s | %25s | %20s' % (my_item["id"],my_item["dateCreated"],my_item["user"]))
+
+	elif config.command == "get":
+
+		policyDetail = getPolicy(config.policy_set, config.name, config.network)
+		print("Policy:",config.policy_set,"\tNetwork:",config.network,"\tOutput:",config.output_file)
 		if hasattr(config, 'output_file') and config.output_file != None :
-			config.output_file.write(json.dumps(policyList, indent=2))
+			config.output_file.write(json.dumps(policyDetail, indent=2))
 			config.output_file.close()
-		else :
-			print(json.dumps(policyList, indent=2))
+		else:
+			print(json.dumps(policyDetail, indent=2))
 
-	elif config.command == "retrieve":
-		if config.network.upper() == "STAGING" or config.network.upper() == "PRODUCTION" :
-			
-			policyDetail = retrievePolicy(config.policy_set, config.name, config.network)
+	elif config.command == "set":
 
-			if hasattr(config, 'output_file') and config.output_file != None :
-				if hasattr(config, 'human_readable') and config.human_readable != None :
-					config.output_file.write(json2html.convert(policyDetail))
-				else :
-					config.output_file.write(json.dumps(policyDetail, indent=2))
-				config.output_file.close()
-			else :
-				if hasattr(config, 'human_readable') and config.human_readable != None :
-					print(json2html.convert(policyDetail))
-				print(json.dumps(policyDetail, indent=2))
-
-		else :
-			print("Invalid 'network' argument, must be 'STAGING' or 'PRODUCTION'")
-			
-	elif config.command == "update":
-
-		if config.network.upper() == "STAGING" or config.network.upper() == "PRODUCTION" :
-			
 			policyJSON = config.input_file.read()
 			config.input_file.close()
 
-			policyDetail = updatePolicy(config.policy_set, config.name, policyJSON, config.network)
-			
-			print(json.dumps(policyDetail, indent=2))
-		else :
-			print("Invalid 'network' argument, must be 'STAGING' or 'PRODUCTION'")
+			policyDetail = setPolicy(config.policy_set, config.name, policyJSON, config.network)
 
-	elif config.command == "add":
-		cmdResult = addPolicy(config.policy_set, config.name)
-		print(json.dumps(cmdResult, indent=2))
+			print(json.dumps(policyDetail, indent=2))
 
 	elif config.command == "delete":
-		cmdResult = deletePolicy(config.policy_set, config.name)
+		cmdResult = deletePolicy(config.policy_set, config.name, config.network)
 		print(json.dumps(cmdResult, indent=2))
 
 	else:
@@ -211,15 +188,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-	
-
-
-
-
-
-
-
-
-
-

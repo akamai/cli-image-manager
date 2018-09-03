@@ -1,12 +1,12 @@
 {
   "requirements": {
-    "python": "2.7.6"
+    "python": "3.6.5"
   },
   "commands": [
     {
       "name": "imaging",
       "aliases": ["img"],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": "An Akamai CLI package for Image Manager"
     }
   ]
