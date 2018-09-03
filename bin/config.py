@@ -40,8 +40,8 @@ class EdgeGridConfig():
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
         list_parser = subparsers.add_parser("list", help="List all Policies")
-        list_parser.add_argument('--network', '-n', help="Network to list from (staging or production). Default is production", metavar='network', action='store', choices=['staging', 'production'],default='production')
-        list_parser.add_argument('--output_type', '-t', default='json', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is json')
+        list_parser.add_argument('--network', '-n', help="Network to list from (staging, production or both). Default is both", metavar='network', action='store', choices=['staging', 'production','both'],default='both')
+        list_parser.add_argument('--output_type', '-t', default='text', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is text')
 
         get_parser = subparsers.add_parser("get", help="Retrieves a policy")
         get_parser.add_argument('name', help="Policy name to retrieve", action='store')
@@ -50,7 +50,7 @@ class EdgeGridConfig():
 
         update_parser = subparsers.add_parser("set", help="Add or updates a policy from a JSON file")
         update_parser.add_argument('name', help="Policy name to update", action='store')
-        update_parser.add_argument('--input_file', '-t', type=argparse.FileType('rt'), required=True, metavar='file_name', help="JSON Config file")
+        update_parser.add_argument('--input_file', '-f', type=argparse.FileType('rt'), required=True, metavar='file_name', help="JSON Config file")
         update_parser.add_argument('--network', '-n', help="Network where the policy resides (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
         delete_parser = subparsers.add_parser("delete", help="Deletes a policy ()")

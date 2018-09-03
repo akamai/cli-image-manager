@@ -84,16 +84,18 @@ prdHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_prd)
 stgHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_stg)
 
 def listPolicies(lunaToken, network):
+	""" List the policies on a given network """
 	session.headers.update({'Luna-Token': lunaToken})
 
 	if network == "staging" :
 		listResult = stgHttpCaller.getResult("/imaging/v2/policies")
-	else :
+	if network == "production" :
 		listResult = prdHttpCaller.getResult("/imaging/v2/policies")
 
 	return(listResult)
 
 def getPolicy(lunaToken, policyName, network):
+	""" Gets a specific policy on a given network in JSON format """
 	session.headers.update({'Luna-Token': lunaToken})
 
 	print("Retrieving: " + policyName + " from " + network)
@@ -106,7 +108,7 @@ def getPolicy(lunaToken, policyName, network):
 	return(policyResult)
 
 def setPolicy(lunaToken, policyName, policyData, network):
-
+	""" Creates or updates a policy in a given network (or both) out of a JSON input file """
 	session.headers.update({'Luna-Token': lunaToken, "Content-Type": "application/json"})
 
 	print("Updating " + policyName)
@@ -119,6 +121,7 @@ def setPolicy(lunaToken, policyName, policyData, network):
 	return(policyResult)
 
 def deletePolicy(lunaToken, policyName, network):
+	""" Deletes a policy in a given network (or both) """
 	session.headers.update({'Luna-Token': lunaToken})
 
 	print("deleting " + policyName + " on " + network + " networks")
@@ -135,30 +138,40 @@ def deletePolicy(lunaToken, policyName, network):
 
 	return(policyResult)
 
-def main():
+def formatOutput(policyList,output_type):
+	""" Formats the output on a given format (json, html table or text) """
+	if output_type == "json" :
+		# Let's convert the JSON to HTML
+		print(json.dumps(policyList, indent=2))
 
+	if output_type == "html" :
+		# Let's convert the JSON to HTML
+		print(json2html.convert(policyList))
+
+	if output_type == "text" :
+		# Iterate over the dictionary and print only selected information
+		print('%20s | %25s | %20s' % ("Policy name","Date Created","User"))
+		print('='*77)
+		for my_item in policyList["items"]:
+			print('%20s | %25s | %20s' % (my_item["id"],my_item["dateCreated"],my_item["user"]))
+
+def main():
+	""" Processes the right command (list, get, set or delete) """
 	if config.command == "list":
 		# Get the list of policies in JSON format for the given network
-		policyList = listPolicies(config.policy_set, config.network)
-
 		print("Policy:",config.policy_set,"\tNetwork:",config.network,"\tOutput:",config.output_type)
 
-		if hasattr(config, 'output_type') and config.output_type == "json" :
-			# Let's convert the JSON to HTML
-			policyListFormatted = json.dumps(policyList, indent=2)
-			print(policyListFormatted)
+		if config.network == "both":
+			print("\nSTAGING:")
+			policyList = listPolicies(config.policy_set, "staging")
+			formatOutput(policyList,config.output_type)
+			print("\nPRODUCTION:")
+			policyList = listPolicies(config.policy_set, "production")
+			formatOutput(policyList,config.output_type)
+		else:
+			policyList = listPolicies(config.policy_set, config.network)
+			formatOutput(policyList,config.output_type)
 
-		if hasattr(config, 'output_type') and config.output_type == "html" :
-			# Let's convert the JSON to HTML
-			policyListFormatted = json2html.convert(policyList)
-			print(policyListFormatted)
-
-		if hasattr(config, 'output_type') and config.output_type == "text" :
-			# Iterate over the dictionary and print only selected information
-			print('%20s | %25s | %20s' % ("Policy name","Date Created","User"))
-			print('='*77)
-			for my_item in policyList["items"]:
-				print('%20s | %25s | %20s' % (my_item["id"],my_item["dateCreated"],my_item["user"]))
 
 	elif config.command == "get":
 
@@ -171,12 +184,18 @@ def main():
 			print(json.dumps(policyDetail, indent=2))
 
 	elif config.command == "set":
-
-			policyJSON = config.input_file.read()
-			config.input_file.close()
-
+		policyJSON = config.input_file.read()
+		config.input_file.close()
+		if config.network == "both":
+			print("STAGING:")
+			policyDetail = setPolicy(config.policy_set, config.name, policyJSON, "staging")
+			print(json.dumps(policyDetail, indent=2))
+			print("PRODUCTION:")
+			policyDetail = setPolicy(config.policy_set, config.name, policyJSON, "production")
+			print(json.dumps(policyDetail, indent=2))
+		else:
+			print(config.network)
 			policyDetail = setPolicy(config.policy_set, config.name, policyJSON, config.network)
-
 			print(json.dumps(policyDetail, indent=2))
 
 	elif config.command == "delete":
