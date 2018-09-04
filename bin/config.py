@@ -1,10 +1,10 @@
 # Python edgegrid module - CONFIG for ImgMan CLI module
 """ Copyright 2017 Akamai Technologies, Inc. All Rights Reserved.
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
 
- You may obtain a copy of the License at 
+ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
@@ -15,23 +15,24 @@
  limitations under the License.
 """
 
-import sys, os
-
-if sys.version_info[0] >= 3:
-     # python3
-     from configparser import ConfigParser
-     import http.client as http_client
-else:
-     # python2.7
-     from ConfigParser import ConfigParser
-     import httplib as http_client
-
+import sys
+import os
 import argparse
 import logging
+
+if sys.version_info[0] >= 3:
+    # python3
+    from configparser import ConfigParser
+    import http.client as http_client
+else:
+    # python2.7
+    from ConfigParser import ConfigParser
+    import httplib as http_client
 
 logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='Process command line options.')
+
 
 class EdgeGridConfig():
 
@@ -57,27 +58,25 @@ class EdgeGridConfig():
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
         delete_parser.add_argument('--network', '-n', help="Network to delete from (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
-        parser.add_argument('--cache', '-c', default=False, action='count', help=' Uses the last cached version of the call (offline mode)')
         parser.add_argument('--verbose', '-v', default=False, action='count', help=' Verbose mode')
         parser.add_argument('--debug', '-d', default=False, action='count', help=' Debug mode (prints HTTP headers)')
         parser.add_argument('--edgerc', '-e', default='~/.edgerc', metavar='credentials_file', help=' Location of the credentials file (default is ~/.edgerc)')
-        parser.add_argument('--section', '-s', default='imaging', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
+        parser.add_argument('--credential_section', '-c', default='imaging', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
+        parser.add_argument('--policy_set', '-p', action='store', metavar='im_policy_name', help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
+        parser.add_argument('--session', '-s', default=False, action='store', help=' Session name (see: https://github.com/akamai/cli-imaging#sessions)')
 
-        required = parser.add_argument_group('Required arguments')
-        required.add_argument('--policy_set', '-p', action='store', metavar='im_policy_name',  required=True, help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
-        
         if flags:
             for argument in flags.keys():
                 parser.add_argument('--' + argument, action=flags[argument])
 
         arguments = {}
         for argument in config_values:
-        	if config_values[argument]:
-        		if config_values[argument] == "False" or config_values[argument] == "True":
-        			parser.add_argument('--' + argument, action='count')
-        		parser.add_argument('--' + argument)
-        		arguments[argument] = config_values[argument]
-        
+            if config_values[argument]:
+                if config_values[argument] == "False" or config_values[argument] == "True":
+                    parser.add_argument('--' + argument, action='count')
+                parser.add_argument('--' + argument)
+                arguments[argument] = config_values[argument]
+
         try:
             args = parser.parse_args()
         except:
@@ -96,8 +95,8 @@ class EdgeGridConfig():
         if "section" in arguments and arguments["section"]:
             configuration = arguments["section"]
 
-        arguments["edgerc"] = os.path.expanduser(arguments["edgerc"])	
-        
+        arguments["edgerc"] = os.path.expanduser(arguments["edgerc"])
+
         if os.path.isfile(arguments["edgerc"]):
             config = ConfigParser()
             config.readfp(open(arguments["edgerc"]))
@@ -107,15 +106,15 @@ class EdgeGridConfig():
                 err_msg += "ERROR: and run 'python gen_edgerc.py %s' to generate the credential file\n" % configuration
                 sys.exit( err_msg )
             for key, value in config.items(configuration):
-            	# ConfigParser lowercases magically
-            	if key not in arguments or arguments[key] == None:
-            		arguments[key] = value
-        else:
-            	print ("Missing configuration file.  Run python gen_edgerc.py to get your credentials file set up once you've provisioned credentials in LUNA.")
-            	return None
+                # ConfigParser lowercases magically
+                if key not in arguments or arguments[key] is None:
+                    arguments[key] = value
+                else:
+                    print("Missing configuration file.  Run python gen_edgerc.py to get your credentials file set up once you've provisioned credentials in LUNA.")
+                    return None
 
         for option in arguments:
-            setattr(self,option,arguments[option])
+            setattr(self, option, arguments[option])
 
         self.create_base_url()
 
