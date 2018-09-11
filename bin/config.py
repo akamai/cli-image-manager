@@ -40,30 +40,30 @@ class EdgeGridConfig():
 
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
-        list_parser = subparsers.add_parser("list", help="List all Policies")
+        list_parser = subparsers.add_parser("list-policies", help="List all Policies")
         list_parser.add_argument('--network', '-n', help="Network to list from (staging, production or both). Default is both", metavar='network', action='store', choices=['staging', 'production','both'],default='both')
-        list_parser.add_argument('--output_type', '-t', default='text', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is text')
+        list_parser.add_argument('--output-type', '-t', default='text', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is text')
 
-        get_parser = subparsers.add_parser("get", help="Retrieves a policy")
+        get_parser = subparsers.add_parser("get-policy", help="Gets a specific policy")
         get_parser.add_argument('name', help="Policy name to retrieve", action='store')
         get_parser.add_argument('--network', '-n', help="Network to list from (staging or production). Default is production", metavar='network', action='store', choices=['staging', 'production'],default='production')
-        get_parser.add_argument('--output_file', '-f', type=argparse.FileType('wt'), metavar='file_name', help=' Save output to a file')
+        get_parser.add_argument('--output-file', '-f', type=argparse.FileType('wt'), metavar='file_name', help=' Save output to a file')
 
-        update_parser = subparsers.add_parser("set", help="Add or updates a policy from a JSON file")
+        update_parser = subparsers.add_parser("set-policy", help="Add or updates a given policy out of a JSON file")
         update_parser.add_argument('name', help="Policy name to update", action='store')
-        update_parser.add_argument('--input_file', '-f', type=argparse.FileType('rt'), required=True, metavar='file_name', help="JSON Config file")
+        update_parser.add_argument('--input-file', '-f', type=argparse.FileType('rt'), required=True, metavar='filename', help="JSON Config file")
         update_parser.add_argument('--network', '-n', help="Network where the policy resides (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
-        delete_parser = subparsers.add_parser("delete", help="Deletes a policy ()")
+        delete_parser = subparsers.add_parser("delete-policy", help="Deletes a policy")
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
         delete_parser.add_argument('--network', '-n', help="Network to delete from (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
         parser.add_argument('--verbose', '-v', default=False, action='count', help=' Verbose mode')
         parser.add_argument('--debug', '-d', default=False, action='count', help=' Debug mode (prints HTTP headers)')
         parser.add_argument('--edgerc', '-e', default='~/.edgerc', metavar='credentials_file', help=' Location of the credentials file (default is ~/.edgerc)')
-        parser.add_argument('--credential_section', '-c', default='imaging', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
-        parser.add_argument('--policy_set', '-p', action='store', metavar='im_policy_name', help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
-        parser.add_argument('--session', '-s', default=False, action='store', help=' Session name (see: https://github.com/akamai/cli-imaging#sessions)')
+        parser.add_argument('--section', '-c', default='imaging', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
+        parser.add_argument('--policy-set', '-p', action='store', metavar='im_policy_name', required=True, help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
+        parser.add_argument('--session', '-s', default=False, action='store', help=' Session name (see: https://github.com/akamai/cli-image-manager#sessions)')
 
         if flags:
             for argument in flags.keys():

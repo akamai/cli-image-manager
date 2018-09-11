@@ -15,6 +15,8 @@
  limitations under the License.
 """
 import sys
+import os
+import requests
 import logging
 import json
 from akamai.edgegrid import EdgeGridAuth
@@ -89,8 +91,8 @@ class EdgeGridHttpCaller():
             for key in result:
                 if type(key) is not str or isinstance(result, dict) or not isinstance(result[key], dict):
                     continue
-        if "errorString" in result[key] and type(result[key]["errorString"]) is str:
-            error_string = result[key]["errorString"]
+                if "errorString" in result[key] and type(result[key]["errorString"]) is str:
+                    error_string = result[key]["errorString"]
         if error_string:
             error_msg = "ERROR: Call caused a server fault.\n"
             error_msg += "ERROR: Please check the problem details for more information:\n"
