@@ -42,7 +42,7 @@ class EdgeGridConfig():
 
         list_parser = subparsers.add_parser("list-policies", help="List all Policies")
         list_parser.add_argument('--network', '-n', help="Network to list from (staging, production or both). Default is both", metavar='network', action='store', choices=['staging', 'production','both'],default='both')
-        list_parser.add_argument('--output-type', '-t', default='text', choices=['json', 'html', 'text'],metavar='json/html/text', help=' Output type {json, html, text}. Default is text')
+        list_parser.add_argument('--output-type', '-t', default='text', choices=['json', 'text'],metavar='json/text', help=' Output type {json, text}. Default is text')
 
         get_parser = subparsers.add_parser("get-policy", help="Gets a specific policy")
         get_parser.add_argument('name', help="Policy name to retrieve", action='store')

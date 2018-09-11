@@ -30,9 +30,8 @@ import random
 import re
 import requests
 import json
-import json2html
 import urllib
-import texttable
+import texttable as tt
 from http_calls import EdgeGridHttpCaller
 from akamai.edgegrid import EdgeGridAuth
 from config import EdgeGridConfig
@@ -160,23 +159,31 @@ def deletePolicy(lunaToken, policyName, network):
 
 
 def formatOutput(policyList, output_type):
-    """ Formats the output on a given format (json, html table or text) """
+    """ Formats the output on a given format (json or text) """
     if output_type == "json":
-        # Let's convert the JSON to HTML
+        # Let's print the JSON
         print(json.dumps(policyList, indent=2))
 
-    if output_type == "html":
-        # Let's convert the JSON to HTML
-        print(json2html.convert(policyList))
-
     if output_type == "text":
-        # Iterate over the dictionary and print only selected information
-        print('%30s | %25s | %20s' % ("Policy name", "Date Created", "User"))
+        # Iterate over the dictionary and print the selected information
+        ParentTable = tt.Texttable()
+        ParentTable.set_cols_width([30,25,25])
+        ParentTable.set_cols_align(['c','c','c'])
+        ParentTable.set_cols_valign(['m','m','m'])
+        Parentheader = ['Policy name','Date Created','User']
+        ParentTable.header(Parentheader)
+        for my_item in policyList["items"]:
+            Parentrow = [ my_item["id"], my_item["dateCreated"], my_item["user"]]
+            ParentTable.add_row(Parentrow)
+        MainParentTable = ParentTable.draw()
+        print(MainParentTable)
+        """print('%30s | %25s | %20s' % ("Policy name", "Date Created", "User"))
         print('='*81)
         for my_item in policyList["items"]:
             print('%30s | %25s | %20s' % (my_item["id"],
                                           my_item["dateCreated"],
                                           my_item["user"]))
+        """
 
 
 def main():
