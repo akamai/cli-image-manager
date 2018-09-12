@@ -23,6 +23,7 @@
 
 """
 # Libraries commmon to python 2 and 3
+from __future__ import print_function
 import sys
 import os
 import logging
@@ -32,10 +33,14 @@ import requests
 import json
 import urllib
 import texttable as tt
+from future import standard_library
+from future.builtins import next
+from future.builtins import object
 from http_calls import EdgeGridHttpCaller
 from akamai.edgegrid import EdgeGridAuth
 from config import EdgeGridConfig
 from subprocess import call
+standard_library.install_aliases()
 
 if sys.version_info[0] >= 3:
      # python3
@@ -43,6 +48,7 @@ if sys.version_info[0] >= 3:
 else:
      # python2.7
      from urlparse import urljoin
+
 
 PACKAGE_VERSION = "0.1.3"
 
