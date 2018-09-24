@@ -6,7 +6,7 @@
     {
       "name": "image-manager",
       "aliases": ["im"],
-      "version": "0.1.3",
+      "version": "0.1.4",
       "description": "An Akamai CLI package for Image Manager"
     }
   ]
