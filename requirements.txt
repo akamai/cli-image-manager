@@ -1,3 +1,4 @@
+cffi
 edgegrid-python==1.1.1
 requests==2.14.2
 texttable==1.4.0
