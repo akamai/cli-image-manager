@@ -3,4 +3,4 @@ requests==2.14.2
 texttable==1.4.0
 configparser==3.5.0
 future==0.16.0
-cryptopraphy=2.1.4
+cryptopraphy==2.1.4
