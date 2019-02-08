@@ -253,3 +253,7 @@ To update to the latest version:
 ```
 $ akamai update image-manager
 ```
+
+## Issues
+
+Please report any issues [here in GitHub] (https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
