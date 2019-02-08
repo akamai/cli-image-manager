@@ -256,4 +256,4 @@ $ akamai update image-manager
 
 ## Issues / Enhancement requests
 
-Please report any issues or enhancement ideas [here in GitHub] (https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
+Please report any issues or enhancement ideas [here in GitHub](https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
