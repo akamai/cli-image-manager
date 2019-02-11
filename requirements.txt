@@ -1,5 +1,6 @@
 cffi
 edgegrid-python==1.1.1
+idna<2.7,>=2.5
 requests==2.14.2
 texttable==1.4.0
 configparser==3.5.0
