@@ -254,6 +254,9 @@ To update to the latest version:
 $ akamai update image-manager
 ```
 
-## Issues / Enhancement requests
+## Bugs / Enhancement requests
 
 Please report any issues or enhancement ideas [here in GitHub](https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
+
+## Installation issues
+
