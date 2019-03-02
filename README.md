@@ -1,6 +1,10 @@
 # Akamai CLI: Image Manager Module
 
-This module enables the use of Image Manager in the Akamai CLI tool
+This module enables the use of Image Manager (IM) in the Akamai CLI tool
+
+## API Permissions
+
+Please ensure your API client has access to the "Image Manager" API (you may need to create a separate API client)
 
 ## Install
 
