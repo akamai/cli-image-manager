@@ -31,10 +31,9 @@ else:
 
 logger = logging.getLogger(__name__)
 
-parser = argparse.ArgumentParser(description='Process command line options.')
-
-
 class EdgeGridConfig():
+
+    parser = argparse.ArgumentParser(description='Process command line options.')
 
     def __init__(self, config_values, configuration, flags=None):
 
