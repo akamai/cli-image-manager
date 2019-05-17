@@ -36,7 +36,7 @@ class EdgeGridConfig():
     parser = argparse.ArgumentParser(description='Process command line options.')
 
     def __init__(self, config_values, configuration, flags=None):
-
+        parser = self.parser
         subparsers = parser.add_subparsers(help='commands', dest="command")
 
         list_parser = subparsers.add_parser("list-policies", help="List all Policies")
