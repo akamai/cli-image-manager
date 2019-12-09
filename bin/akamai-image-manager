@@ -49,9 +49,6 @@ else:
      # python2.7
      from urlparse import urljoin
 
-
-PACKAGE_VERSION = "0.1.8"
-
 session = requests.Session()
 debug = False
 verbose = False
