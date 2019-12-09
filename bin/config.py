@@ -29,6 +29,8 @@ else:
     from ConfigParser import ConfigParser
     import httplib as http_client
 
+PACKAGE_VERSION = "0.1.8"
+
 logger = logging.getLogger(__name__)
 
 class EdgeGridConfig():
@@ -57,7 +59,8 @@ class EdgeGridConfig():
         delete_parser.add_argument('name', help="Policy name to delete", action='store')
         delete_parser.add_argument('--network', '-n', help="Network to delete from (staging, production or both). Default is production", metavar='network', action='store', choices=['staging', 'production','both'],default='production')
 
-        parser.add_argument('--verbose', '-v', default=False, action='count', help=' Verbose mode')
+        parser.add_argument('--verbose', default=False, action='count', help=' Verbose mode')
+        parser.add_argument('--version', '-v', default=False, action='version', version='version ' + PACKAGE_VERSION, help=' Version number')
         parser.add_argument('--debug', '-d', default=False, action='count', help=' Debug mode (prints HTTP headers)')
         parser.add_argument('--edgerc', '-e', default='~/.edgerc', metavar='credentials_file', help=' Location of the credentials file (default is ~/.edgerc)')
         parser.add_argument('--section', '-c', default='image-manager', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
@@ -91,6 +94,10 @@ class EdgeGridConfig():
             requests_log = logging.getLogger("requests.packages.urllib3")
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
+
+        if arguments['version']:
+            print("Version: " + PACKAGE_VERSION)
+            sys.exit()
 
         if "section" in arguments and arguments["section"]:
             configuration = arguments["section"]
