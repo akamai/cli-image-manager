@@ -29,6 +29,7 @@ akamai image-manager [global flags] --policy-set POLICY-SET command
 - `--debug` - `-d` - prints debug information
 - `--verbose` - Print verbose information
 - `--version`, `-v` — Print the version
+- `--policy-set POLICY-SET` (REQUIRED) Name of the Image Manager policy to manage (grep for "policyTokenDefault" within the Property Manager configuration)
 - `--help`, `-h` — Show help
 
 ## Commands  
@@ -263,4 +264,3 @@ $ akamai update image-manager
 Please report any issues or enhancement ideas [here in GitHub](https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
 
 ## Installation issues
-
