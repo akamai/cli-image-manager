@@ -15,11 +15,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- ***********************************************************
- * Imgaging CLI module by Javier Garza (jgarza@akamai.com) *
- * Based on https://github.com/brassic-lint/cli-imgman     *
- *       from Gareth Hughes                                *
- ***********************************************************
+ ****************************************************************
+ * Image Manager CLI module by Javier Garza (jgarza@akamai.com) *
+ * Based on https://github.com/brassic-lint/cli-imgman          *
+ *       from Gareth Hughes                                     *
+ ****************************************************************
 
 """
 # Libraries commmon to python 2 and 3
