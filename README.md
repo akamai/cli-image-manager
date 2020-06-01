@@ -264,3 +264,5 @@ $ akamai update image-manager
 Please report any issues or enhancement ideas [here in GitHub](https://github.com/akamai/cli-image-manager/issues). Pull requests are welcomed!
 
 ## Installation issues
+
+TBD
