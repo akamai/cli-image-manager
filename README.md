@@ -1,3 +1,10 @@
+<!--esi 
+<esi:assign name="page_title" value="'''Akamai Image Manager CLI'''" />
+<esi:assign name="dac_stylesheets" value="['/stylesheets/screen.css']" />
+<esi:assign name="dac_footer_js" value="['/javascripts/app/toc.js']" />
+<esi:assign name="jumbotron" value="'''Akamai Image Manager CLI'''" /> 
+<esi:eval src="/internal/header.html?http" dca="esi" />
+-->
 # Akamai CLI: Image Manager Module
 
 This module enables the use of Image Manager (IM) in the Akamai CLI tool
@@ -266,3 +273,6 @@ Please report any issues or enhancement ideas [here in GitHub](https://github.co
 ## Installation issues
 
 TBD
+<!--esi 
+<esi:eval src="/internal/footer.html?http" dca="esi" />
+-->
