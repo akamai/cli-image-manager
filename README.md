@@ -3,9 +3,9 @@
 <esi:assign name="dac_footer_js" value="['/javascripts/app/toc.js']" />
 <esi:eval src="/internal/header.html?http" dca="esi" />
 -->
-# Akamai CLI: Image Manager Module
+# Akamai CLI: Image and Video Manager Module
 
-This module enables the use of Image Manager (IM) in the Akamai CLI tool
+This module enables the use of Image and Video Manager (IM) in the Akamai CLI tool
 
 ## API Permissions
 
