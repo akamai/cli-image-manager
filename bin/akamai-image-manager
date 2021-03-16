@@ -83,27 +83,21 @@ if hasattr(config, 'headers'):
 
 session.headers.update({'User-Agent': "AkamaiCLI"})
 
-baseurl_prd = '%s://%s/' % ('https', config.host)
-baseurl_stg = '%s://%s/' % ('https', config.host.replace(".imaging.",
-                                                         ".imaging-staging."))
+baseurl = '%s://%s/' % ('https', config.host)
 
-prdHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_prd)
-stgHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_stg)
+HttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl)
+
 
 
 def listPolicies(lunaToken, network, account_key=''):
     """ List the policies on a given network """
     session.headers.update({'Luna-Token': lunaToken})
 
-    list_endpoint = "/imaging/v2/policies"
+    list_endpoint = "/imaging/v2/network/" + network + "/policies"
     if account_key != '':
-        list_endpoint = list_endpoint + '?accountSwitchkey=' + account_key
+        list_endpoint = list_endpoint + '?accountSwitchKey=' + account_key
 
-    if network == "staging":
-        listResult = stgHttpCaller.getResult(list_endpoint)
-    if network == "production":
-        listResult = prdHttpCaller.getResult(list_endpoint)
-
+    listResult = HttpCaller.getResult(list_endpoint)
     return(listResult)
 
 
@@ -111,16 +105,17 @@ def getPolicy(lunaToken, policyName, network, account_key=''):
     """ Gets a specific policy on a given network in JSON format """
     session.headers.update({'Luna-Token': lunaToken})
 
-    get_policy_endpoint = "/imaging/v2/policies/" + policyName
+    if network == 'staging':
+        get_policy_endpoint = "/imaging/v2/network/staging/policies/" + policyName
+    else:
+        get_policy_endpoint = "/imaging/v2/network/production/policies/" + policyName   
+
     if account_key != '':
-        get_policy_endpoint = get_policy_endpoint + '?accountSwitchkey=' + account_key    
+        get_policy_endpoint = get_policy_endpoint + '?accountSwitchKey=' + account_key    
 
     print("Retrieving: " + policyName + " from " + network)
 
-    if network == "staging" :
-        policyResult = stgHttpCaller.getResult(get_policy_endpoint)
-    else:
-        policyResult = prdHttpCaller.getResult(get_policy_endpoint)
+    policyResult = HttpCaller.getResult(get_policy_endpoint)
 
     return(policyResult)
 
@@ -131,16 +126,18 @@ def setPolicy(lunaToken, policyName, policyData, network, account_key=''):
     session.headers.update({'Luna-Token': lunaToken, "Content-Type":
                             "application/json"})
 
-    set_policy_endpoint = "/imaging/v2/policies/" + policyName
+    if network == 'staging':
+        set_policy_endpoint = "/imaging/v2/network/staging/policies/" + policyName
+    else:
+        set_policy_endpoint = "/imaging/v2/network/production/policies/" + policyName
+
+
     if account_key != '':
-        set_policy_endpoint = set_policy_endpoint + '?accountSwitchkey=' + account_key     
+        set_policy_endpoint = set_policy_endpoint + '?accountSwitchKey=' + account_key     
 
     print("Updating " + policyName)
 
-    if network == "staging":
-        policyResult = stgHttpCaller.putResult(set_policy_endpoint, policyData)
-    else:
-        policyResult = prdHttpCaller.putResult(set_policy_endpoint, policyData)
+    policyResult = HttpCaller.putResult(set_policy_endpoint, policyData)
 
     return(policyResult)
 
@@ -149,21 +146,24 @@ def deletePolicy(lunaToken, policyName, network, account_key=''):
     """ Deletes a policy in a given network (or both) """
     session.headers.update({'Luna-Token': lunaToken})
 
-    del_policy_endpoint = "/imaging/v2/policies/" + policyName
+    del_policy_stg_endpoint = "/imaging/v2/network/staging/policies/" + policyName
+    del_policy_prd_endpoint = "/imaging/v2/network/production/policies/" + policyName
+
     if account_key != '':
-        del_policy_endpoint = del_policy_endpoint + '?accountSwitchkey=' + account_key     
+        del_policy_stg_endpoint = del_policy_stg_endpoint + '?accountSwitchKey=' + account_key     
+        del_policy_prd_endpoint = del_policy_prd_endpoint + '?accountSwitchKey=' + account_key     
 
     print("deleting " + policyName + " on " + network + " networks")
     if network == "both":
-        policyResultStg = stgHttpCaller.deleteResult(del_policy_endpoint)
-        policyResultPrd = prdHttpCaller.deleteResult(del_policy_endpoint)
+        policyResultStg = HttpCaller.deleteResult(del_policy_stg_endpoint)
+        policyResultPrd = HttpCaller.deleteResult(del_policy_prd_endpoint)
         policyResult = {"staging": policyResultStg, "production":
                         policyResultPrd}
     if network == "staging":
-        policyResultStg = stgHttpCaller.deleteResult(del_policy_endpoint)
+        policyResultStg = HttpCaller.deleteResult(del_policy_stg_endpoint)
         policyResult = {"staging": policyResultStg}
     if network == "production":
-        policyResultPrd = prdHttpCaller.deleteResult(del_policy_endpoint)
+        policyResultPrd = HttpCaller.deleteResult(del_policy_prd_endpoint)
         policyResult = {"production": policyResultPrd}
 
     return(policyResult)
