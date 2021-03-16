@@ -91,71 +91,79 @@ prdHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_prd)
 stgHttpCaller = EdgeGridHttpCaller(session, debug, verbose, baseurl_stg)
 
 
-def listPolicies(lunaToken, network):
+def listPolicies(lunaToken, network, account_key=''):
     """ List the policies on a given network """
     session.headers.update({'Luna-Token': lunaToken})
 
+    list_endpoint = "/imaging/v2/policies"
+    if account_key != '':
+        list_endpoint = list_endpoint + '?accountSwitchkey=' + account_key
+
     if network == "staging":
-        listResult = stgHttpCaller.getResult("/imaging/v2/policies")
+        listResult = stgHttpCaller.getResult(list_endpoint)
     if network == "production":
-        listResult = prdHttpCaller.getResult("/imaging/v2/policies")
+        listResult = prdHttpCaller.getResult(list_endpoint)
 
     return(listResult)
 
 
-def getPolicy(lunaToken, policyName, network):
+def getPolicy(lunaToken, policyName, network, account_key=''):
     """ Gets a specific policy on a given network in JSON format """
     session.headers.update({'Luna-Token': lunaToken})
+
+    get_policy_endpoint = "/imaging/v2/policies/" + policyName
+    if account_key != '':
+        get_policy_endpoint = get_policy_endpoint + '?accountSwitchkey=' + account_key    
 
     print("Retrieving: " + policyName + " from " + network)
 
     if network == "staging" :
-        policyResult = stgHttpCaller.getResult("/imaging/v2/policies/"
-                                               + policyName)
+        policyResult = stgHttpCaller.getResult(get_policy_endpoint)
     else:
-        policyResult = prdHttpCaller.getResult("/imaging/v2/policies/"
-                                               + policyName)
+        policyResult = prdHttpCaller.getResult(get_policy_endpoint)
 
     return(policyResult)
 
 
-def setPolicy(lunaToken, policyName, policyData, network):
+def setPolicy(lunaToken, policyName, policyData, network, account_key=''):
     """ Creates or updates a policy in a given network (or both) out of
     a JSON input file """
     session.headers.update({'Luna-Token': lunaToken, "Content-Type":
                             "application/json"})
 
+    set_policy_endpoint = "/imaging/v2/policies/" + policyName
+    if account_key != '':
+        set_policy_endpoint = set_policy_endpoint + '?accountSwitchkey=' + account_key     
+
     print("Updating " + policyName)
 
     if network == "staging":
-        policyResult = stgHttpCaller.putResult("/imaging/v2/policies/"
-                                               + policyName, policyData)
+        policyResult = stgHttpCaller.putResult(set_policy_endpoint, policyData)
     else:
-        policyResult = prdHttpCaller.putResult("/imaging/v2/policies/"
-                                               + policyName, policyData)
+        policyResult = prdHttpCaller.putResult(set_policy_endpoint, policyData)
 
     return(policyResult)
 
 
-def deletePolicy(lunaToken, policyName, network):
+def deletePolicy(lunaToken, policyName, network, account_key=''):
     """ Deletes a policy in a given network (or both) """
     session.headers.update({'Luna-Token': lunaToken})
 
+    del_policy_endpoint = "/imaging/v2/policies/" + policyName
+    if account_key != '':
+        del_policy_endpoint = del_policy_endpoint + '?accountSwitchkey=' + account_key     
+
     print("deleting " + policyName + " on " + network + " networks")
     if network == "both":
-        policyResultStg = stgHttpCaller.deleteResult("/imaging/v2/policies/"
-                                                     + policyName)
-        policyResultPrd = prdHttpCaller.deleteResult("/imaging/v2/policies/"
-                                                     + policyName)
+        policyResultStg = stgHttpCaller.deleteResult(del_policy_endpoint)
+        policyResultPrd = prdHttpCaller.deleteResult(del_policy_endpoint)
         policyResult = {"staging": policyResultStg, "production":
                         policyResultPrd}
     if network == "staging":
-        policyResultStg = stgHttpCaller.deleteResult("/imaging/v2/policies/"
-                                                     + policyName)
+        policyResultStg = stgHttpCaller.deleteResult(del_policy_endpoint)
         policyResult = {"staging": policyResultStg}
     if network == "production":
-        policyResultPrd = prdHttpCaller.deleteResult("/imaging/v2/policies/"
-                                                     + policyName)
+        policyResultPrd = prdHttpCaller.deleteResult(del_policy_endpoint)
         policyResult = {"production": policyResultPrd}
 
     return(policyResult)
@@ -198,19 +206,19 @@ def main():
 
         if config.network == "both":
             print("\nSTAGING:")
-            policyList = listPolicies(config.policy_set, "staging")
+            policyList = listPolicies(config.policy_set, "staging", config.account_key)
             formatOutput(policyList, config.output_type)
             print("\nPRODUCTION:")
-            policyList = listPolicies(config.policy_set, "production")
+            policyList = listPolicies(config.policy_set, "production", config.account_key)
             formatOutput(policyList, config.output_type)
         else:
-            policyList = listPolicies(config.policy_set, config.network)
+            policyList = listPolicies(config.policy_set, config.network, config.account_key)
             formatOutput(policyList, config.output_type)
 
     elif config.command == "get-policy":
 
         policyDetail = getPolicy(config.policy_set, config.name,
-                                 config.network)
+                                 config.network, config.account_key)
         print("Policy:", config.policy_set, "\tNetwork:", config.network,
               "\tOutput:", config.output_file)
         if hasattr(config, 'output_file') and config.output_file is not None:
@@ -225,21 +233,21 @@ def main():
         if config.network == "both":
             print("STAGING:")
             policyDetail = setPolicy(config.policy_set, config.name,
-                                     policyJSON, "staging")
+                                     policyJSON, "staging", config.account_key)
             print(json.dumps(policyDetail, indent=2))
             print("PRODUCTION:")
             policyDetail = setPolicy(config.policy_set, config.name,
-                                     policyJSON, "production")
+                                     policyJSON, "production", config.account_key)
             print(json.dumps(policyDetail, indent=2))
         else:
             print(config.network)
             policyDetail = setPolicy(config.policy_set, config.name,
-                                     policyJSON, config.network)
+                                     policyJSON, config.network, config.account_key)
             print(json.dumps(policyDetail, indent=2))
 
     elif config.command == "delete-policy":
         cmdResult = deletePolicy(config.policy_set, config.name,
-                                 config.network)
+                                 config.network, config.account_key)
         print(json.dumps(cmdResult, indent=2))
     else:
         config.parser.print_help(sys.stderr)
