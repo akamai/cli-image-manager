@@ -28,6 +28,10 @@ and compiling it yourself.
 akamai image-manager [global flags] --policy-set POLICY-SET command
 ```
 
+```
+akamai video-manager [global flags] --policy-set POLICY-SET command
+```
+
 ## Global Flags
 - `--edgerc value` — Location of the credentials file (default: user's directory like "/Users/jgarza") [$AKAMAI_EDGERC]
 - `--section value` — Section of the credentials file (default: "default") [$AKAMAI_EDGERC_SECTION]
@@ -67,6 +71,23 @@ optional arguments:
   --output-type json/text, -t json/text
                         Output type {json, text}. Default is text
 ```
+
+```
+$ akamai video-manager --section default --policy-set example_com list-policies --help
+
+usage: akamai-video-manager list-policies [-h] [--network network]
+                           [--output-type json/text]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --network network, -n network
+                        Network to list from (staging, production or both).
+                        Default is both
+  --output-type json/text, -t json/text
+                        Output type {json, text}. Default is text
+```
+
+#### Below examples are valid for video-manager as well
 
 #### List of all policies (default is both networks and text output)
 Retrieve a list of all policies in human readable format using a specific instance of the Image Manager behavior available on both networks:
