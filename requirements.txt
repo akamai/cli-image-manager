@@ -1,8 +1,8 @@
 cffi
 edgegrid-python>=1.1.1,<2.0
 idna<2.7,>=2.5
-requests==2.20.0
+requests==2.23.0
 texttable==1.4.0
 configparser==3.5.0
 future==0.16.0
-cryptography>=2.1.4
+cryptography>=3.2
