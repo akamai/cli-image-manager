@@ -219,8 +219,7 @@ def main():
 
         policyDetail = getPolicy(config.policy_set, config.name,
                                  config.network, config.account_key)
-        print("Policy:", config.policy_set, "\tNetwork:", config.network,
-              "\tOutput:", config.output_file)
+
         if hasattr(config, 'output_file') and config.output_file is not None:
             config.output_file.write(json.dumps(policyDetail, indent=2))
             config.output_file.close()
@@ -240,7 +239,6 @@ def main():
                                      policyJSON, "production", config.account_key)
             print(json.dumps(policyDetail, indent=2))
         else:
-            print(config.network)
             policyDetail = setPolicy(config.policy_set, config.name,
                                      policyJSON, config.network, config.account_key)
             print(json.dumps(policyDetail, indent=2))
