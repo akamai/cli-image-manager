@@ -201,7 +201,8 @@ def main():
     """ Processes the right command (list, get, set or delete) """
     if config.command == "list-policies":
         # Get the list of policies in JSON format for the given network
-        print("Policy:", config.policy_set, "\tNetwork:", config.network,
+        if config.output_type == "text":
+            print("Policy:", config.policy_set, "\tNetwork:", config.network,
               "\tOutput:", config.output_type)
 
         if config.network == "both":
