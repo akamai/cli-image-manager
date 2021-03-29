@@ -65,7 +65,7 @@ class EdgeGridConfig():
         parser.add_argument('--edgerc', '-e', default='~/.edgerc', metavar='credentials_file', help=' Location of the credentials file (default is ~/.edgerc)')
         parser.add_argument('--section', '-c', default='image-manager', metavar='credentials_file_section', action='store', help=' Credentials file Section\'s name to use')
         parser.add_argument('--policy-set', '-p', action='store', metavar='im_policy_name', required=True, help=' Image Manager Policy Name (as indicated in Property Manager and IM Policy Manager)')
-        parser.add_argument('--account-key', '-a', action='store', metavar='account_switch_key', required=True, help=' Account Switch Key for Internal Users')
+        parser.add_argument('--account-key', '-a', default='', action='store', metavar='account_switch_key', required=True, help=' Account Switch Key for Internal Users')
         # parser.add_argument('--lookup-policy-set', '-l', action='store', metavar='property_name', help=' Lookup Image Manager Policy Name (by Property name)')
         # parser.add_argument('--session', '-s', default=False, action='store', help=' Session name (see: https://github.com/akamai/cli-image-manager#sessions)')
 
