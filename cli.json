@@ -1,13 +1,19 @@
 {
   "requirements": {
-    "python": "2.7.11"
+    "python": "3.*"
   },
   "commands": [
     {
       "name": "image-manager",
       "aliases": ["im"],
-      "version": "0.1.8",
+      "version": "0.1.9",
       "description": "An Akamai CLI package for Image Manager"
-    }
+    },
+    {
+      "name": "video-manager",
+      "aliases": ["vm"],
+      "version": "0.1.9",
+      "description": "An Akamai CLI package for Video Manager"
+    }    
   ]
 }
